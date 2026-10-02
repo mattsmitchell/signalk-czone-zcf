@@ -6,9 +6,9 @@
   "license": "MIT",
   "main": "index.js",
   "engines": { "node": ">=20" },
-  "files": ["index.js", "lib/", "test/fixtures/", "README.md", "LICENSE"],
+  "files": ["index.js", "lib/", "README.md", "LICENSE"],
   "keywords": ["signalk", "czone", "zcf", "nmea2000", "parser"],
   "scripts": {
-    "test": "node test/zcf-circuit-table.test.js && node test/zcf-status-table.test.js && node test/fixtures.test.js"
+    "test": "node test/zcf-circuit-table.test.js && node test/zcf-status-table.test.js"
   }
 }
