@@ -6,7 +6,6 @@ const { parseCircuitTable, parseStatusTable, buildStatusMap, buildStatusOutputMa
 function makeCircuitTable () {
   function record (id, flags, category, name, outputModule, outputChannel) {
     const nameBuf = Buffer.from(name, 'utf8')
-    const controls = Buffer.from([2, 0, 0, 0, 0, 0])
     const outputs = Buffer.from([outputChannel, outputModule, 0xE8, 0x03, 0])
     return Buffer.concat([
       Buffer.from([id]),
@@ -19,9 +18,11 @@ function makeCircuitTable () {
       Buffer.from([1, 0]), outputs
     ])
   }
-  const recordBody = record(1, 0, 0x20, 'Test Circuit', 1, 2)
-  const h=Buffer.alloc(10); h.writeUInt32LE(6+recordBody.length); h.writeUInt16LE(1); Buffer.from([8,8,5,14]).copy(h,6)
-  return Buffer.concat([h,recordBody])
+  const circuit = record(1, 0, 0x20, 'Test Circuit', 1, 2)
+  const mode = record(2, 0, 0, 'Test Mode', 1, 3)
+  const payload = Buffer.concat([circuit, mode])
+  const h=Buffer.alloc(10); h.writeUInt32LE(6+payload.length); h.writeUInt16LE(2); Buffer.from([8,8,5,14]).copy(h,6)
+  return Buffer.concat([h,payload])
 }
 
 function makeStatusTable () {
