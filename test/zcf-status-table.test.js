@@ -1,7 +1,7 @@
 'use strict'
 
 const assert = require('assert')
-const { parseCircuitTable, parseStatusTable, buildStatusMap, buildStatusOutputMap } = require('../')
+const { parseCircuitTable, parseStatusTable, buildStatusMap, buildStatusOutputMap, decodeNamedStatusTable, decodeLoadStatusTable } = require('../')
 
 function makeCircuitTable () {
   const name = Buffer.from('Test Circuit')
@@ -28,7 +28,10 @@ function makeStatusTable () {
 
 const circuitZcf=makeCircuitTable()
 const zcf=Buffer.concat([circuitZcf,makeStatusTable()])
-const status=parseStatusTable(zcf,parseCircuitTable(zcf))
+const circuitTable=parseCircuitTable(zcf)
+const statusStart=circuitTable.offset + 4 + circuitTable.tableLength
+console.log('DEBUG', { circuitTable, statusStart, header: zcf.subarray(statusStart, statusStart + 8).toString('hex'), named: decodeNamedStatusTable(zcf,statusStart), load: decodeLoadStatusTable(zcf,statusStart) })
+const status=parseStatusTable(zcf,circuitTable)
 assert(status)
 assert.strictEqual(status.recordCount,1)
 const byName=buildStatusMap(status)
