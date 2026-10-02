@@ -9,16 +9,23 @@ This package owns the shared format-level parsing logic so `signalk-czone` and `
 ```js
 const zcf = require('signalk-czone-zcf')
 
-const table = zcf.parseCircuitTable(buffer)
-const circuits = zcf.parseCircuits(buffer)
-const modes = zcf.parseModes(buffer)
+const parsed = zcf.parse(buffer)
+// parsed.circuitTable, parsed.statusTable, parsed.circuits, parsed.modes
+
+// File convenience API; it returns the same parsed representation plus
+// fileName, filePath and fileSize.
+const fromFile = zcf.load('/path/to/installation.zcf')
+
+const table = parsed.circuitTable
+const circuits = parsed.circuits
+const modes = parsed.modes
 
 const statusTable = zcf.parseStatusTable(buffer, table)
 const statusByName = zcf.buildStatusMap(statusTable)
 const statusByOutput = zcf.buildStatusOutputMap(statusTable)
 ```
 
-The parser is deliberately structural: table lengths, record counts, record boundaries and field lengths define the data. It does not rely on file-wide name searches or fixed byte signatures.
+The parser is deliberately structural: table lengths, record counts, record boundaries and field lengths define the data. `parse(buffer)` is the canonical Buffer API; `load(filename)` is its file convenience wrapper. It does not rely on file-wide name searches or fixed byte signatures.
 
 ## Scope
 
