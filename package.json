@@ -9,6 +9,6 @@
   "files": ["index.js", "lib/", "README.md", "LICENSE"],
   "keywords": ["signalk", "czone", "zcf", "nmea2000", "parser"],
   "scripts": {
-    "test": "node test/zcf-circuit-table.test.js && node test/zcf-status-table.test.js"
+    "test": "node test/zcf-circuit-table.test.js && node test/zcf-status-table.test.js && node test/fixtures.test.js"
   }
 }
