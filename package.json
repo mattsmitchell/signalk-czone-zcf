@@ -1,0 +1,14 @@
+{
+  "name": "signalk-czone-zcf",
+  "version": "0.1.0-beta.1",
+  "description": "Canonical structural parser for Signal K CZone ZCF configuration and status tables",
+  "author": "svSugarShack <matt@ick.com>",
+  "license": "MIT",
+  "main": "index.js",
+  "engines": { "node": ">=20" },
+  "files": ["index.js", "lib/", "README.md", "LICENSE"],
+  "keywords": ["signalk", "czone", "zcf", "nmea2000", "parser"],
+  "scripts": {
+    "test": "node test/zcf-circuit-table.test.js && node test/zcf-status-table.test.js"
+  }
+}
