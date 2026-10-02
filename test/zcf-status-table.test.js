@@ -12,7 +12,7 @@ function makeCircuitTable () {
     (() => { const b=Buffer.alloc(2); b.writeUInt16LE(0x20); return b })(),
     Buffer.from([name.length]), name,
     Buffer.from([2,0,0,0,0,0]),
-    Buffer.from([7,0,0,0,1,0]), output
+    Buffer.from([11,0,0,0,1,0]), output
   ])
   const h=Buffer.alloc(10); h.writeUInt32LE(6+record.length); h.writeUInt16LE(1); Buffer.from([8,8,5,14]).copy(h,6)
   return Buffer.concat([h,record])
