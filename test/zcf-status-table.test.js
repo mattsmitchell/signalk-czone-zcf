@@ -19,7 +19,7 @@ function makeCircuitTable () {
       Buffer.from([1, 0]), outputs
     ])
   }
-  const recordBody = record(1, 0, 0x20, 'Test Circuit', 0x14, 2)
+  const recordBody = record(1, 0, 0x20, 'Test Circuit', 1, 2)
   const h=Buffer.alloc(10); h.writeUInt32LE(6+recordBody.length); h.writeUInt16LE(1); Buffer.from([8,8,5,14]).copy(h,6)
   return Buffer.concat([h,recordBody])
 }
@@ -34,10 +34,7 @@ function makeStatusTable () {
 
 const circuitZcf=makeCircuitTable()
 const zcf=Buffer.concat([circuitZcf,makeStatusTable()])
-const circuitTable=parseCircuitTable(zcf)
-const statusStart=circuitTable.offset + 4 + circuitTable.tableLength
-console.log('DEBUG', { circuitTable, statusStart, header: zcf.subarray(statusStart, statusStart + 8).toString('hex'), named: require('../').decodeNamedStatusTable(zcf,statusStart) })
-const status=parseStatusTable(zcf,circuitTable)
+const status=parseStatusTable(zcf,parseCircuitTable(zcf))
 assert(status)
 assert.strictEqual(status.recordCount,1)
 const byName=buildStatusMap(status)
