@@ -35,9 +35,7 @@ function makeStatusTable () {
 
 const circuitZcf=makeCircuitTable()
 const zcf=Buffer.concat([circuitZcf,makeStatusTable()])
-const circuitTable = { offset: 0, tableLength: circuitZcf.readUInt32LE(0) }
-const statusStart = circuitTable.offset + 4 + circuitTable.tableLength
-console.log('DEBUG', { circuitTable, statusStart, statusHeader: zcf.subarray(statusStart, statusStart + 7).toString('hex'), named: require('../').decodeNamedStatusTable(zcf,statusStart) })
+const circuitTable = { offset: 0, tableLength: circuitZcf.length - 4 }
 const status=parseStatusTable(zcf,circuitTable)
 assert(status)
 assert.strictEqual(status.recordCount,1)
