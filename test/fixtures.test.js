@@ -16,6 +16,8 @@ for (const file of expected) {
   assert.strictEqual(table.records.length, table.recordCount)
 
   const parsed = parse(buffer)
+  assert.strictEqual(typeof parsed.vesselName, 'string', file)
+  assert(parsed.vesselName.length > 0, file + ': expected vessel/configuration name')
   assert(Array.isArray(parsed.modules), file)
   assert(Array.isArray(parsed.moduleAddresses), file)
   assert.strictEqual(parsed.moduleAddresses.length, parsed.modules.length, file)
