@@ -3,6 +3,8 @@
 const fs = require('fs')
 const path = require('path')
 const zcf = require('./lib/zcf')
+const circuitTable = require('./lib/zcf-circuit-table')
+const statusTable = require('./lib/zcf-status-table')
 const { parseModuleDeclarations } = require('./lib/zcf-modules')
 
 function parse (buffer) {
@@ -29,6 +31,8 @@ function load (filePath) {
 
 module.exports = {
   ...zcf,
+  ...circuitTable,
+  ...statusTable,
   parse,
   load,
   parseModuleDeclarations
