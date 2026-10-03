@@ -30,6 +30,14 @@ for (const file of expected) {
   assert(commandDeviceId, file + ': no unused CZone command device ID')
   assert(!used.has(commandDeviceId), file + ': command device ID collides with module table')
   assert.strictEqual(commandDeviceId, Math.min(...available), file)
+
+  if (file === 'Sel-Citron-02.04.25.zcf') {
+    const bilge = parsed.circuits.find(c => c.name === 'Bilge Buzzer - Port')
+    assert(bilge, 'Sel-Citron: expected Bilge Buzzer - Port')
+    assert((bilge.flags & 0x00800000) !== 0, 'Sel-Citron: expected Alarms sub-category bit')
+    assert(bilge.subCategories.includes('Alarms'), 'Sel-Citron: expected Alarms sub-category')
+    assert.strictEqual(bilge.unknownSubCategoryBits & 0x00800000, 0)
+  }
 }
 
 console.log('Canonical ZCF fixture corpus and module address tests passed')
