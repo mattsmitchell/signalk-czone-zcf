@@ -22,6 +22,6 @@
     "parser"
   ],
   "scripts": {
-    "test": "node test/zcf-circuit-table.test.js && node test/zcf-status-table.test.js && node test/zcf-parse.test.js && node test/fixtures.test.js"
+    "test": "node test/zcf-circuit-table.test.js && node test/zcf-status-table.test.js && node test/zcf-parse.test.js && node test/zcf-model.test.js && node test/fixtures.test.js"
   }
 }
