@@ -5,6 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const { parseTankMonitors } = require('../lib/zcf-tank-monitors')
 const { parseMeters } = require('../lib/zcf-meters')
+const zcf = require('../')
 
 const fixture = name => path.join(__dirname, 'fixtures', name)
 const readFixture = name => {
@@ -33,6 +34,9 @@ const readFixture = name => {
 
   assert.strictEqual(ss.monitors[0].calibration[3].levelPercent, 100)
   assert.strictEqual(ss.monitors[1].calibration[1].levelPercent, 25)
+
+  const parsed = zcf.parse(fs.readFileSync(fixture('SugarShack-20260927-01.zcf')))
+  assert.strictEqual(parsed.tankMonitors.count, 4)
 }
 
 {
