@@ -1,7 +1,7 @@
 'use strict'
 
 const assert = require('assert')
-const { parseCircuitTable, parseCircuits, parseModes } = require('../')
+const { parseCircuitTable, parseCircuits, parseModes, decodeCategories } = require('../')
 
 function record (id, flags, category, name, outputModule, outputChannel) {
   const nameBuf = Buffer.from(name, 'utf8')
@@ -36,4 +36,12 @@ assert.strictEqual(parseCircuits(zcf).length, 1)
 assert.strictEqual(parseModes(zcf).length, 1)
 assert.strictEqual(parseCircuits(zcf)[0].name, 'Test Circuit')
 assert.strictEqual(parseModes(zcf)[0].name, 'Test Mode')
+
+const categories = decodeCategories(0x54040000, 0x71)
+assert.deepStrictEqual(categories.masterCategories, ['Favorites', 'DC', 'AC'])
+assert.deepStrictEqual(categories.subCategories, ['Lighting', 'Navigation', 'Pumps', 'Power', 'Entertainment'])
+assert.strictEqual(categories.unknownSubCategoryBits, 0)
+assert.strictEqual(categories.unknownCategoryWordBits, 0)
+assert.strictEqual(categories.subCategoryBits, 0x54040000)
+assert.strictEqual(categories.categoryWord, 0x71)
 console.log('CZone circuit-table parser tests passed')
