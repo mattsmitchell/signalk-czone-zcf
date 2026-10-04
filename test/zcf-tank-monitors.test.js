@@ -4,9 +4,10 @@ const assert = require('assert')
 const fs = require('fs')
 const path = require('path')
 const { parseTankMonitors } = require('../lib/zcf-tank-monitors')
+const { parseMeters } = require('../lib/zcf-meters')
 
 const fixture = name => path.join(__dirname, 'fixtures', name)
-const readFixture = name => parseTankMonitors(fs.readFileSync(fixture(name)))
+const readFixture = name => {\n  const buffer = fs.readFileSync(fixture(name))\n  const meters = parseMeters(buffer)\n  return parseTankMonitors(buffer, meters ? meters.offset : null)\n}
 
 {
   const ss = readFixture('SugarShack-20260927-01.zcf')
