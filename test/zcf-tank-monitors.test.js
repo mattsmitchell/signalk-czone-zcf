@@ -69,7 +69,12 @@ const readFixture = name => {
   )
 }
 
-for (const debugName of ['Sel-Citron-02.04.25.zcf', 'Persevere-14.07.25.zcf', 'Compass-Rose-28.06.26.zcf', 'TestBench.zcf']) {\n  const debug = readFixture(debugName)\n  console.log(debugName, JSON.stringify(debug.monitors.map(m => ({ name: m.name, calibration: m.calibration.map(p => [p.senderValue, p.levelRaw]) }))))\n}\n\nfor (const name of [
+for (const debugName of ['Sel-Citron-02.04.25.zcf', 'Persevere-14.07.25.zcf', 'Compass-Rose-28.06.26.zcf', 'TestBench.zcf']) {
+  const debug = readFixture(debugName)
+  console.log(debugName, JSON.stringify(debug.monitors.map(m => ({ name: m.name, calibration: m.calibration.map(p => [p.senderValue, p.levelRaw]) }))))
+}
+
+for (const name of [
   'Compass-Rose-28.06.26.zcf',
   'Persevere-14.07.25.zcf',
   'Sel-Citron-02.04.25.zcf',
