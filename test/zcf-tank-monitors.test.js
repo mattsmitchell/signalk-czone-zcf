@@ -10,7 +10,7 @@ const fixture = name => path.join(__dirname, 'fixtures', name)
 const readFixture = name => {
   const buffer = fs.readFileSync(fixture(name))
   const meters = parseMeters(buffer)
-  return parseTankMonitors(buffer, meters && meters.dcSettings ? meters.dcSettings.offset : null)
+  return parseTankMonitors(buffer, meters ? meters.offset : null)
 }
 
 {
