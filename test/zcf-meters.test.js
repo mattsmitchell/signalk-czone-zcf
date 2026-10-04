@@ -78,4 +78,58 @@ assert.strictEqual(parsed.meters[2].instanceFrom, 'settings')
 assert.strictEqual(parsed.meters[0].virtual, true)
 assert.strictEqual(parsed.meters[2].virtual, false)
 
+const fs = require('fs')
+const path = require('path')
+
+const fixture = name => path.join(__dirname, 'fixtures', name)
+const readFixture = name => parseMeters(fs.readFileSync(fixture(name)))
+
+for (const name of [
+  'Compass-Rose-28.06.26.zcf',
+  'Meitaki-07.04.25.zcf',
+  'Persevere-14.07.25.zcf',
+  'Sel-Citron-02.04.25.zcf',
+  'SugarShack-20260927-01.zcf',
+  'TestBench.zcf'
+]) {
+  assert(readFixture(name), `meters parsed: ${name}`)
+}
+
+{
+  const cr = Object.fromEntries(readFixture('Compass-Rose-28.06.26.zcf').meters.map(m => [m.name, m]))
+  assert.deepStrictEqual(
+    [cr['House Battery'].instance, cr['House Battery'].dcType, cr['House Battery'].nominalVoltage],
+    [0, 'battery', 12]
+  )
+  assert.deepStrictEqual(
+    [cr.Solar.instance, cr.Solar.dcType, cr.Solar.nominalVoltage],
+    [1, 'solar', 12]
+  )
+}
+
+{
+  const ss = Object.fromEntries(readFixture('SugarShack-20260927-01.zcf').meters.map(m => [m.name, m]))
+  for (const name of ['Solar Port', 'Solar Stbd', 'Solar Arch Port', 'Solar Arch Stbd']) {
+    assert.strictEqual(ss[name].dcType, 'solar', name)
+  }
+  for (const name of ['Port Alternator', 'Stbd Alternator', 'Port Alt Current', 'Stbd Alt Current']) {
+    assert.strictEqual(ss[name].dcType, 'alternator', name)
+  }
+}
+
+{
+  const mei = Object.fromEntries(readFixture('Meitaki-07.04.25.zcf').meters.map(m => [m.name, m]))
+  assert.strictEqual(mei['Bow Thruster Battery 24V'].nominalVoltage, 24)
+}
+
+{
+  const sel = Object.fromEntries(readFixture('Sel-Citron-02.04.25.zcf').meters.map(m => [m.name, m]))
+  assert.strictEqual(sel['12V DC'].dcType, 'converter')
+}
+
+{
+  const bench = Object.fromEntries(readFixture('TestBench.zcf').meters.map(m => [m.name, m]))
+  assert.strictEqual(bench['5V System - MI'].dcType, 'converter')
+}
+
 console.log('ZCF meter parser tests passed')
