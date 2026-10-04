@@ -61,12 +61,12 @@ const ownership = attachOwnOutputs([
   { id: 1, outputs: [{ module: 1, channel: 2 }] },
   { id: 2, outputs: [{ module: 1, channel: 2 }, { module: 1, channel: 3 }] },
   { id: 3, outputs: [{ module: 1, channel: 4 }] },
-  { id: 4, outputs: [{ module: 1, channel: 4 }] }
+  { id: 4, outputs: [{ module: 1, channel: 4 }, { module: 1, channel: 5 }] }
 ])
 assert.deepStrictEqual(ownership[0].ownOutputs, [{ module: 1, channel: 2 }])
 assert.deepStrictEqual(ownership[1].ownOutputs, [{ module: 1, channel: 3 }])
 assert.deepStrictEqual(ownership[2].ownOutputs, [{ module: 1, channel: 4 }])
-assert.deepStrictEqual(ownership[3].ownOutputs, [{ module: 1, channel: 4 }])
+assert.deepStrictEqual(ownership[3].ownOutputs, [{ module: 1, channel: 5 }])
 assert.strictEqual(ownership[0].primaryOutput, ownership[0].outputs[0])
 
 console.log('CZone circuit-table parser tests passed')
