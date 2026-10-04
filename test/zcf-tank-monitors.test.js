@@ -69,15 +69,34 @@ const readFixture = name => {
   )
 }
 
-for (const debugName of ['Sel-Citron-02.04.25.zcf', 'Persevere-14.07.25.zcf', 'Compass-Rose-28.06.26.zcf', 'TestBench.zcf']) {
-  const debug = readFixture(debugName)
-  console.log(debugName, JSON.stringify(debug.monitors.map(m => ({ name: m.name, calibration: m.calibration.map(p => [p.senderValue, p.levelRaw]) }))))
+{
+  const sel = readFixture('Sel-Citron-02.04.25.zcf')
+  assert.strictEqual(sel.count, 6)
+  assert.deepStrictEqual(
+    sel.monitors.map(m => m.name),
+    [
+      'Black Water Level - Port',
+      'Fresh Water Level - Port',
+      'Fuel Level - Port',
+      'Fuel Level - STBD',
+      'Black Water Level - STBD',
+      'Fresh Water Level - STBD'
+    ]
+  )
+
+  assert.deepStrictEqual(
+    sel.monitors[0].calibration.map(p => [p.senderValue, p.levelRaw]),
+    [[4000, 0], [8000, 6250], [12000, 12500], [16000, 18750], [20000, 25000]]
+  )
+  assert.deepStrictEqual(
+    sel.monitors[2].calibration.map(p => [p.senderValue, p.levelRaw]),
+    [[0, 0], [1000, 5000], [2000, 10000], [3000, 15000], [4000, 20000], [5000, 25000]]
+  )
 }
 
 for (const name of [
   'Compass-Rose-28.06.26.zcf',
   'Persevere-14.07.25.zcf',
-  'Sel-Citron-02.04.25.zcf',
   'TestBench.zcf'
 ]) {
   assert.strictEqual(readFixture(name).count, 0, `no tank monitors: ${name}`)
