@@ -1,7 +1,7 @@
 'use strict'
 
 const assert = require('assert')
-const { parseCircuitTable, parseCircuits, parseModes, decodeCategories } = require('../')
+const { parseCircuitTable, parseCircuits, parseModes, decodeCategories, attachOwnOutputs } = require('../')
 
 function record (id, flags, category, name, outputModule, outputChannel) {
   const nameBuf = Buffer.from(name, 'utf8')
@@ -56,4 +56,20 @@ assert.strictEqual(categories.categoryWord, 0x2FFF)
 // Bit 12 is intentionally left unnamed; it must remain visible as unknown metadata.
 const unknown = decodeCategories(0, 0x1000)
 assert.strictEqual(unknown.unknownCategoryWordBits, 0x1000)
+
+const ownership = attachOwnOutputs([
+  { id: 1, outputs: [{ module: 1, channel: 2 }] },
+  { id: 2, outputs: [{ module: 1, channel: 2 }, { module: 1, channel: 3 }] },
+  { id: 3, outputs: [{ module: 1, channel: 4 }] },
+  { id: 4, outputs: [{ module: 1, channel: 4 }] }
+])
+assert.deepStrictEqual(ownership[0].ownOutputs, [])
+assert.deepStrictEqual(ownership[1].ownOutputs, [
+  { module: 1, channel: 2 },
+  { module: 1, channel: 3 }
+])
+assert.deepStrictEqual(ownership[2].ownOutputs, [{ module: 1, channel: 4 }])
+assert.deepStrictEqual(ownership[3].ownOutputs, [{ module: 1, channel: 4 }])
+assert.strictEqual(ownership[0].primaryOutput, ownership[0].outputs[0])
+
 console.log('CZone circuit-table parser tests passed')
