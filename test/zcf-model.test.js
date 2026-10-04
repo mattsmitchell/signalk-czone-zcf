@@ -110,4 +110,18 @@ assert.strictEqual(noControls.display.onDisplay, false)
 assert.strictEqual(noControls.showInCircuitList, false)
 assert.deepStrictEqual(display.categories.master, ['DC'])
 
+const ownershipModel = buildCircuitModel(
+  [{
+    ...record({ id: 10, outputs: [{ module: 1, channel: 2 }] }),
+    controls: []
+  }, {
+    ...record({ id: 11, outputs: [{ module: 1, channel: 2 }, { module: 1, channel: 3 }] }),
+    controls: []
+  }],
+  new Map(), new Map(), null, null, []
+)
+assert.strictEqual(ownershipModel[0].ownOutputCount, 0)
+assert.strictEqual(ownershipModel[1].ownOutputCount, 2)
+assert.strictEqual(ownershipModel[1].primaryOutput.channel, 2)
+
 console.log('CZone canonical circuit display/virtual model tests passed')
