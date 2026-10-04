@@ -33,7 +33,7 @@ The parser is deliberately structural: table lengths, record counts, record boun
 
 The status relationship, including the primary module/channel fallback used when no usable status-table row exists, is part of the ZCF model. Consumers should not duplicate that logic.
 
-The structural records remain available as `parsed.structuralCircuits` when a consumer needs the exact table representation.
+The structural records remain available as `parsed.structuralCircuits` when a consumer needs the exact table representation. Unknown or unverified fields are preserved rather than inferred.
 
 Module declarations and the length-prefixed vessel/configuration name are exposed as structural metadata. `moduleAddresses` contains the non-zero CZone device/dipswitch addresses declared by the configuration.
 
