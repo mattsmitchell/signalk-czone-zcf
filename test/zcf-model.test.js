@@ -120,8 +120,8 @@ const ownershipModel = buildCircuitModel(
   }],
   new Map(), new Map(), null, null, []
 )
-assert.strictEqual(ownershipModel[0].ownOutputCount, 0)
-assert.strictEqual(ownershipModel[1].ownOutputCount, 2)
-assert.strictEqual(ownershipModel[1].primaryOutput.channel, 2)
+assert.strictEqual(ownershipModel[0].ownOutputCount, 1)
+assert.strictEqual(ownershipModel[1].ownOutputCount, 1)
+assert.strictEqual(ownershipModel[1].primaryOutput.channel, 3)
 
 console.log('CZone canonical circuit display/virtual model tests passed')
