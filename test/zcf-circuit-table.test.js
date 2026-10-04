@@ -53,6 +53,7 @@ assert.strictEqual(categories.unknownSubCategoryBits, 0)
 assert.strictEqual(categories.unknownCategoryWordBits, 0)
 assert.strictEqual(categories.subCategoryBits, 0xFFFF0000)
 assert.strictEqual(categories.categoryWord, 0x2FFF)
+// Bit 12 is intentionally left unnamed; it must remain visible as unknown metadata.
 const unknown = decodeCategories(0, 0x1000)
 assert.strictEqual(unknown.unknownCategoryWordBits, 0x1000)
 console.log('CZone circuit-table parser tests passed')
