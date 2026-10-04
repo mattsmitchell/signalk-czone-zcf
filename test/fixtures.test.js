@@ -2,7 +2,7 @@
 const assert = require('assert')
 const fs = require('fs')
 const path = require('path')
-const { parse, parseCircuitTable } = require('../')
+const { parse, parseCircuitTable, buildCircuitModel, attachStatusMappings } = require('../')
 
 const expected = ['Compass-Rose-28.06.26.zcf', 'Meitaki-07.04.25.zcf', 'Persevere-14.07.25.zcf', 'Sel-Citron-02.04.25.zcf', 'SugarShack-20260927-01.zcf', 'TestBench.zcf']
 const dir = path.join(__dirname, 'fixtures')
@@ -23,6 +23,12 @@ for (const file of expected) {
   assert.strictEqual(parsed.moduleAddresses.length, parsed.modules.length, file)
   assert(parsed.moduleAddresses.length > 0, file + ': expected module addresses')
 
+  assert(Array.isArray(parsed.circuits), file)
+  assert.strictEqual(parsed.circuits.length, parsed.circuitTable.records.filter(r => r.kind === 'circuit').length, file)
+  assert(parsed.circuits.every(c => Number.isInteger(c.module) && Number.isInteger(c.channel)), file + ': expected primary module/channel model')
+  assert(parsed.circuits.every(c => Number.isInteger(c.page) && Number.isInteger(c.slot)), file + ': expected page/slot model')
+  assert(parsed.circuits.every(c => c.status && Number.isInteger(c.status.module) && Number.isInteger(c.status.bit)), file + ': expected status model')
+
   const used = new Set(parsed.moduleAddresses)
   const available = Array.from({ length: 0xFE }, (_, index) => index + 1).filter(id => !used.has(id))
   const commandDeviceId = available[0]
@@ -40,4 +46,24 @@ for (const file of expected) {
   }
 }
 
-console.log('Canonical ZCF fixture corpus and module address tests passed')
+// Regression: status semantics belong to the reusable ZCF model, including
+// the primary module/channel fallback when a status table has no matching row.
+const synthetic = [{
+  id: 1,
+  name: 'Fallback Circuit',
+  flags: 0,
+  category: 0x20,
+  kind: 'circuit',
+  hidden: false,
+  outputs: [{ module: 7, channel: 3, levelRaw: 1000, levelPercent: 100, extended: false, rawHex: '0703e80300' }]
+}]
+const fallback = buildCircuitModel(synthetic, new Map(), new Map(), { format: 'synthetic' })[0]
+assert.strictEqual(fallback.statusModule, 7)
+assert.strictEqual(fallback.statusBit, 3)
+assert.strictEqual(fallback.statusMask, 0x08)
+assert.strictEqual(fallback.statusConfidence, 'primary-module-channel-fallback')
+assert.strictEqual(fallback.status.source, 'primary-module-channel')
+assert.strictEqual(fallback.page, 0)
+assert.strictEqual(fallback.slot, 3)
+
+console.log('Canonical ZCF fixture corpus, circuit model, and status mapping tests passed')
