@@ -44,6 +44,32 @@ const readFixture = name => {
   assert.strictEqual(ss.monitors[2].configurationHeaderHex, '141c0104330001')
   assert.strictEqual(ss.monitors[3].configurationLength, null)
 
+  const portWaterConfig = ss.monitors[0].configuration
+  assert.strictEqual(portWaterConfig.capacityLitres, 400)
+  assert.deepStrictEqual(
+    {
+      low: [portWaterConfig.low.on.percent, portWaterConfig.low.off.percent],
+      high: [portWaterConfig.high.on.percent, portWaterConfig.high.off.percent],
+      veryLow: [portWaterConfig.veryLow.on.percent, portWaterConfig.veryLow.off.percent],
+      veryHigh: [portWaterConfig.veryHigh.on.percent, portWaterConfig.veryHigh.off.percent]
+    },
+    {
+      low: [25, 30],
+      high: [75, 70],
+      veryLow: [10, 15],
+      veryHigh: [90, 85]
+    }
+  )
+  assert.strictEqual(portWaterConfig.low.delay.seconds, 600)
+  assert.strictEqual(portWaterConfig.veryLow.delay.seconds, 600)
+  assert.strictEqual(portWaterConfig.high.delay.seconds, 0)
+  assert.strictEqual(portWaterConfig.veryHigh.delay.seconds, 0)
+
+  const portFuelConfig = ss.monitors[2].configuration
+  assert.strictEqual(portFuelConfig.capacityLitres, 400)
+  assert.strictEqual(portFuelConfig.low.delay.seconds, 0)
+  assert.strictEqual(portFuelConfig.veryLow.delay.seconds, 0)
+
   const parsed = zcf.parse(fs.readFileSync(fixture('SugarShack-20260927-01.zcf')))
   assert.strictEqual(parsed.tankMonitors.count, 4)
 }
