@@ -2,7 +2,7 @@
 const assert = require('assert')
 const fs = require('fs')
 const path = require('path')
-const { parse, parseCircuitTable, buildCircuitModel, attachStatusMappings } = require('../')
+const { parse, parseCircuitTable, buildCircuitModel } = require('../')
 
 const expected = ['Compass-Rose-28.06.26.zcf', 'Meitaki-07.04.25.zcf', 'Persevere-14.07.25.zcf', 'Sel-Citron-02.04.25.zcf', 'SugarShack-20260927-01.zcf', 'TestBench.zcf']
 const dir = path.join(__dirname, 'fixtures')
@@ -25,9 +25,20 @@ for (const file of expected) {
 
   assert(Array.isArray(parsed.circuits), file)
   assert.strictEqual(parsed.circuits.length, parsed.circuitTable.records.filter(r => r.kind === 'circuit').length, file)
-  assert(parsed.circuits.every(c => Number.isInteger(c.module) && Number.isInteger(c.channel)), file + ': expected primary module/channel model')
-  assert(parsed.circuits.every(c => Number.isInteger(c.page) && Number.isInteger(c.slot)), file + ': expected page/slot model')
-  assert(parsed.circuits.every(c => c.status && Number.isInteger(c.status.module) && Number.isInteger(c.status.bit)), file + ': expected status model')
+
+  // Some real configurations contain circuits without a primary output
+  // identity. Preserve that uncertainty rather than inventing one.
+  assert(parsed.circuits.every(c =>
+    (c.module === null && c.channel === null) ||
+    (Number.isInteger(c.module) && Number.isInteger(c.channel))
+  ), file + ': primary module/channel model')
+  assert(parsed.circuits.every(c =>
+    (c.page === null && c.slot === null) ||
+    (Number.isInteger(c.page) && Number.isInteger(c.slot))
+  ), file + ': page/slot model')
+
+  const mapped = parsed.circuits.filter(c => c.module !== null && c.channel !== null)
+  assert(mapped.every(c => c.status && Number.isInteger(c.status.module) && Number.isInteger(c.status.bit)), file + ': mapped circuits must have status model')
 
   const used = new Set(parsed.moduleAddresses)
   const available = Array.from({ length: 0xFE }, (_, index) => index + 1).filter(id => !used.has(id))
@@ -46,8 +57,6 @@ for (const file of expected) {
   }
 }
 
-// Regression: status semantics belong to the reusable ZCF model, including
-// the primary module/channel fallback when a status table has no matching row.
 const synthetic = [{
   id: 1,
   name: 'Fallback Circuit',
