@@ -17,6 +17,7 @@ const readFixture = name => {
 {
   const ss = readFixture('SugarShack-20260927-01.zcf')
   assert.strictEqual(ss.count, 4)
+  assert.strictEqual(ss.configurationLength, 58)
   assert.deepStrictEqual(
     ss.monitors.map(m => m.name),
     ['Port Water Tank', 'Stbd Water Tank', 'Port Fuel Tank', 'Stbd Fuel Tank']
@@ -34,6 +35,14 @@ const readFixture = name => {
 
   assert.strictEqual(ss.monitors[0].calibration[3].levelPercent, 100)
   assert.strictEqual(ss.monitors[1].calibration[1].levelPercent, 25)
+
+  assert.strictEqual(ss.monitors[0].configurationLength, 58)
+  assert.strictEqual(ss.monitors[0].configurationHeaderHex, '161a0104320103')
+  assert.strictEqual(ss.monitors[1].configurationLength, 58)
+  assert.strictEqual(ss.monitors[1].configurationHeaderHex, '101c0502330003')
+  assert.strictEqual(ss.monitors[2].configurationLength, 58)
+  assert.strictEqual(ss.monitors[2].configurationHeaderHex, '141c0104330001')
+  assert.strictEqual(ss.monitors[3].configurationLength, null)
 
   const parsed = zcf.parse(fs.readFileSync(fixture('SugarShack-20260927-01.zcf')))
   assert.strictEqual(parsed.tankMonitors.count, 4)
