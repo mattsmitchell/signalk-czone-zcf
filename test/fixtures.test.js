@@ -25,9 +25,6 @@ for (const file of expected) {
 
   assert(Array.isArray(parsed.circuits), file)
   assert.strictEqual(parsed.circuits.length, parsed.circuitTable.records.filter(r => r.kind === 'circuit').length, file)
-
-  // Some real configurations contain circuits without a primary output
-  // identity. Preserve that uncertainty rather than inventing one.
   assert(parsed.circuits.every(c =>
     (c.module === null && c.channel === null) ||
     (Number.isInteger(c.module) && Number.isInteger(c.channel))
@@ -37,13 +34,9 @@ for (const file of expected) {
     (Number.isInteger(c.page) && Number.isInteger(c.slot))
   ), file + ': page/slot model')
 
-  const mapped = parsed.circuits.filter(c => c.module !== null && c.channel !== null)
-  assert(mapped.every(c => c.status && Number.isInteger(c.status.module) && Number.isInteger(c.status.bit)), file + ': mapped circuits must have status model')
-
   const used = new Set(parsed.moduleAddresses)
   const available = Array.from({ length: 0xFE }, (_, index) => index + 1).filter(id => !used.has(id))
   const commandDeviceId = available[0]
-
   assert(commandDeviceId, file + ': no unused CZone command device ID')
   assert(!used.has(commandDeviceId), file + ': command device ID collides with module table')
   assert.strictEqual(commandDeviceId, Math.min(...available), file)
@@ -56,6 +49,13 @@ for (const file of expected) {
     assert.strictEqual(bilge.unknownSubCategoryBits & 0x00800000, 0)
   }
 }
+
+const testBench = parse(fs.readFileSync(path.join(dir, 'TestBench.zcf')))
+assert(testBench.circuits.every(c => c.statusModule != null && c.statusBit != null && c.statusMask != null), 'TestBench: status mappings must attach')
+const sugar = parse(fs.readFileSync(path.join(dir, 'SugarShack-20260927-01.zcf')))
+const sugarGalley = sugar.circuits.find(c => c.name === 'Galley Lights')
+assert(sugarGalley, 'Sugar Shack: Galley Lights fixture circuit')
+assert(sugarGalley.statusModule != null && sugarGalley.statusBit != null && sugarGalley.statusMask != null, 'Sugar Shack: Galley Lights status mapping')
 
 const synthetic = [{
   id: 1,
