@@ -63,7 +63,24 @@ const readFixture = name => {
   assert.strictEqual(portWaterConfig.low.delay.seconds, 600)
   assert.strictEqual(portWaterConfig.veryLow.delay.seconds, 600)
   assert.strictEqual(portWaterConfig.high.delay.seconds, 0)
-  assert.strictEqual(portWaterConfig.veryHigh.delay.seconds, 0)
+  assert.deepStrictEqual(portWaterConfig.alarmEnable, {
+    low: true,
+    high: false,
+    veryLow: true,
+    veryHigh: false
+  })
+  assert.deepStrictEqual(portWaterConfig.switchEnable, {
+    low: false,
+    high: true,
+    veryLow: false,
+    veryHigh: true
+  })
+  assert.deepStrictEqual(portWaterConfig.severityCodes, {
+    low: 0,
+    high: 1,
+    veryLow: 3,
+    veryHigh: 0
+  })
 
   const portFuelConfig = ss.monitors[2].configuration
   assert.strictEqual(portFuelConfig.capacityLitres, 400)
