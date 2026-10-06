@@ -57,6 +57,41 @@ const sugarGalley = sugar.circuits.find(c => c.name === 'Galley Lights')
 assert(sugarGalley, 'Sugar Shack: Galley Lights fixture circuit')
 assert(sugarGalley.statusModule != null && sugarGalley.statusBit != null && sugarGalley.statusMask != null, 'Sugar Shack: Galley Lights status mapping')
 
+const sugarNoStatus = [
+  'All Lights On',
+  'Fresh Water Pumps',
+  'On Board',
+  'SSB Operation',
+  'Welcome Home',
+  'Wireless Relay Button 1',
+  'Wireless Relay Button 3',
+  'Wireless Relay Button 4'
+]
+for (const name of sugarNoStatus) {
+  const circuit = sugar.circuits.find(c => c.name === name)
+  assert(circuit, 'Sugar Shack: expected ' + name)
+  assert.strictEqual(circuit.statusModule, null, 'Sugar Shack: ' + name + ' must not infer status beside a real status table')
+  assert.strictEqual(circuit.statusBit, null, 'Sugar Shack: ' + name + ' must not infer status beside a real status table')
+}
+
+const compass = parse(fs.readFileSync(path.join(dir, 'Compass-Rose-28.06.26.zcf')))
+const lights = compass.circuits.find(c => c.name === 'Lights')
+assert(lights, 'Compass Rose: expected Lights')
+assert.strictEqual(lights.statusModule, 2, 'Compass Rose: captured Lights status module')
+assert.strictEqual(lights.statusBit, 4, 'Compass Rose: captured Lights status bit')
+
+const instruments = compass.circuits.find(c => c.name === 'Instruments')
+assert(instruments, 'Compass Rose: expected Instruments')
+assert.deepStrictEqual(
+  instruments.outputs.map(output => [output.module, output.channel]),
+  [[1, 0], [2, 11], [2, 9]],
+  'Compass Rose: Instruments fixture output ordering'
+)
+assert.strictEqual(instruments.primaryOutput.module, 2, 'Compass Rose: Instruments own module')
+assert.strictEqual(instruments.primaryOutput.channel, 11, 'Compass Rose: Instruments own channel')
+assert.strictEqual(instruments.statusModule, 2, 'Compass Rose: Instruments inferred status must use own module')
+assert.strictEqual(instruments.statusBit, 11, 'Compass Rose: Instruments inferred status must use own channel')
+
 const synthetic = [{
   id: 1,
   name: 'Fallback Circuit',
@@ -66,7 +101,7 @@ const synthetic = [{
   hidden: false,
   outputs: [{ module: 7, channel: 3, levelRaw: 1000, levelPercent: 100, extended: false, rawHex: '0703e80300' }]
 }]
-const fallback = buildCircuitModel(synthetic, new Map(), new Map(), { format: 'synthetic' })[0]
+const fallback = buildCircuitModel(synthetic, new Map(), new Map(), null)[0]
 assert.strictEqual(fallback.statusModule, 7)
 assert.strictEqual(fallback.statusBit, 3)
 assert.strictEqual(fallback.statusMask, 0x08)
