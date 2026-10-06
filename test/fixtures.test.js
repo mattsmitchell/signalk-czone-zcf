@@ -101,7 +101,7 @@ const synthetic = [{
   hidden: false,
   outputs: [{ module: 7, channel: 3, levelRaw: 1000, levelPercent: 100, extended: false, rawHex: '0703e80300' }]
 }]
-const fallback = buildCircuitModel(synthetic, new Map(), new Map(), { format: 'synthetic' })[0]
+const fallback = buildCircuitModel(synthetic, new Map(), new Map(), null)[0]
 assert.strictEqual(fallback.statusModule, 7)
 assert.strictEqual(fallback.statusBit, 3)
 assert.strictEqual(fallback.statusMask, 0x08)
