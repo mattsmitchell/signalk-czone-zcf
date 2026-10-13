@@ -4,6 +4,22 @@ Canonical parser and data model for CZone ZCF configuration and status tables us
 
 This package owns the shared ZCF format knowledge. Consumers should use the parsed model rather than reconstructing CZone relationships from raw bytes.
 
+## Beta installation
+
+This library is a beta and is installed automatically by `signalk-czone`. It is not a separate Signal K App Store plugin.
+
+For other Node.js consumers, after npm publication:
+
+```bash
+npm install signalk-czone-zcf@0.1.0-beta.1
+```
+
+## Publishing (maintainers)
+
+From this repository, run `npm install`, `npm test`, and `npm pack --dry-run`. Check the package contents, then authenticate with `npm login` and run `npm publish --tag beta`.
+
+Publish this library before publishing a plugin version that depends on it. The package defaults to the `beta` tag; do not promote it to `latest` unintentionally. Each subsequent release needs a new version.
+
 ## API
 
 ```js
