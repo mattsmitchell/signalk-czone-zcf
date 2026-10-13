@@ -12,7 +12,8 @@
     "index.js",
     "lib/",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "keywords": [
     "signalk",
@@ -23,5 +24,17 @@
   ],
   "scripts": {
     "test": "node test/zcf-circuit-table.test.js && node test/zcf-status-table.test.js && node test/zcf-parse.test.js && node test/zcf-model.test.js && node test/zcf-tank-monitors.test.js && node test/fixtures.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mattsmitchell/signalk-czone-zcf.git"
+  },
+  "homepage": "https://github.com/mattsmitchell/signalk-czone-zcf#readme",
+  "bugs": {
+    "url": "https://github.com/mattsmitchell/signalk-czone-zcf/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "beta"
   }
 }
