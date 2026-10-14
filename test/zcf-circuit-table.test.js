@@ -69,4 +69,34 @@ assert.deepStrictEqual(ownership[2].ownOutputs, [{ module: 1, channel: 4 }])
 assert.deepStrictEqual(ownership[3].ownOutputs, [{ module: 1, channel: 5 }])
 assert.strictEqual(ownership[0].primaryOutput, ownership[0].outputs[0])
 
+
+// Internal copies: Meitaki stores "Audible Alarm" three times on one output;
+// 0x01 and 0x02 have no controls, 0x20 is the one the Configuration Tool
+// lists. Clive's Configuration Tool (Oct 2026) shows 123 circuits and 7 modes.
+{
+  const fs = require('fs')
+  const path = require('path')
+  for (const [file, circuits, modes] of [['Meitaki-07.04.25.zcf', 107, 8], ['Meitaki-2026-10-15.zcf', 123, 7]]) {
+    const buf = fs.readFileSync(path.join(__dirname, 'fixtures', file))
+    const internal = parseCircuitTable(buf).records.filter(r => r.kind === 'internal')
+    assert.deepStrictEqual(internal.map(r => [r.name, r.id, r.controlCount, r.hidden]), [['Audible Alarm', 0x01, 0, true], ['Audible Alarm', 0x02, 0, true]], file)
+    const list = parseCircuits(buf)
+    assert.deepStrictEqual([list.length, parseModes(buf).length], [circuits, modes], file)
+    const alarm = list.filter(c => c.name === 'Audible Alarm')
+    assert.deepStrictEqual(alarm.map(c => [c.id, c.ownOutputCount]), [[0x20, 1]], file) // its output is its own again
+  }
+  // Two circuits with one name and no controls on either: nothing to tell
+  // them apart, so neither is taken for an internal copy.
+  {
+    const payload = Buffer.concat([record(1, 0, 0x20, 'Spare', 1, 2), record(2, 0, 0x20, 'Spare', 1, 3)])
+    const header = Buffer.alloc(10)
+    header.writeUInt32LE(6 + payload.length, 0)
+    header.writeUInt16LE(2, 4)
+    Buffer.from([8, 8, 5, 14]).copy(header, 6)
+    assert.deepStrictEqual(parseCircuits(Buffer.concat([header, payload])).map(c => c.id), [1, 2])
+  }
+  // A zero-control circuit with a name of its own stays (SugarShack solar chargers).
+  const ss = parseCircuits(fs.readFileSync(path.join(__dirname, 'fixtures', 'SugarShack-20260927-01.zcf')))
+  assert(ss.some(c => c.name === 'Solar Port Charger CHG' && c.controlCount === 0))
+}
 console.log('CZone circuit-table parser tests passed')
