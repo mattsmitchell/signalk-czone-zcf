@@ -36,13 +36,18 @@ const readFixture = name => {
   assert.strictEqual(ss.monitors[0].calibration[3].levelPercent, 100)
   assert.strictEqual(ss.monitors[1].calibration[1].levelPercent, 25)
 
-  assert.strictEqual(ss.monitors[0].configurationLength, 58)
-  assert.strictEqual(ss.monitors[0].configurationHeaderHex, '161a0104320103')
-  assert.strictEqual(ss.monitors[1].configurationLength, 58)
-  assert.strictEqual(ss.monitors[1].configurationHeaderHex, '101c0502330003')
-  assert.strictEqual(ss.monitors[2].configurationLength, 58)
-  assert.strictEqual(ss.monitors[2].configurationHeaderHex, '141c0104330001')
-  assert.strictEqual(ss.monitors[3].configurationLength, null)
+  // Each tank's settings come from the start of its own record (before its
+  // name). They used to be read from the bytes after its calibration table,
+  // which are the next input's record: Stbd Water Tank then showed 0 L and
+  // levels 60/80 % and 32/28 %, and Stbd Fuel Tank no settings at all.
+  assert.strictEqual(ss.layout, 'long')
+  assert.deepStrictEqual(ss.monitors.map(m => [m.configurationLength, m.configurationHeaderHex, m.configurationOffset === m.offset]), [
+    [58, '151a0104320102', true],
+    [58, '161a0104320103', true],
+    [58, '131c0104330000', true],
+    [58, '141c0104330001', true]
+  ])
+  assert.deepStrictEqual(ss.monitors.map(m => [m.module, m.input, m.configuration.capacityLitres]), [[26, 21, 400], [26, 22, 400], [28, 19, 400], [28, 20, 400]])
 
   const portWaterConfig = ss.monitors[0].configuration
   assert.strictEqual(portWaterConfig.capacityLitres, 400)
@@ -63,24 +68,10 @@ const readFixture = name => {
   assert.strictEqual(portWaterConfig.low.delay.seconds, 600)
   assert.strictEqual(portWaterConfig.veryLow.delay.seconds, 600)
   assert.strictEqual(portWaterConfig.high.delay.seconds, 0)
-  assert.deepStrictEqual(portWaterConfig.alarmEnable, {
-    low: true,
-    high: false,
-    veryLow: true,
-    veryHigh: false
-  })
-  assert.deepStrictEqual(portWaterConfig.switchEnable, {
-    low: false,
-    high: true,
-    veryLow: false,
-    veryHigh: true
-  })
-  assert.deepStrictEqual(portWaterConfig.severityCodes, {
-    low: 0,
-    high: 1,
-    veryLow: 3,
-    veryHigh: 0
-  })
+  // Byte 51 is the calibration-point count; bytes 52/53 are not decoded yet.
+  assert.deepStrictEqual(ss.monitors.map(m => m.configuration.calibrationCount), ss.monitors.map(m => m.calibration.length))
+  assert.deepStrictEqual([portWaterConfig.alarmEnable, portWaterConfig.switchEnable, portWaterConfig.severityCodes], [null, null, null])
+  assert.deepStrictEqual(ss.monitors[1].configuration.low.on.percent, 25) // Stbd Water Tank, read from its own record
 
   const portFuelConfig = ss.monitors[2].configuration
   assert.strictEqual(portFuelConfig.capacityLitres, 400)
@@ -123,6 +114,18 @@ const readFixture = name => {
     fuelPort.calibration.map(p => [p.senderValue, p.levelRaw]),
     [[64, 0], [1662, 25000]]
   )
+  // Own capacities (Fuel Tank Port used to show Fuel Tank Stbd's 275 L).
+  assert.deepStrictEqual(mei.monitors.map(m => m.configuration.capacityLitres), [85, 800, 85, 680, 275, 85])
+
+  // The same boat re-saved by a newer Configuration Tool (October 2026):
+  // the short record layout (no 00 00 00 00 ff ff before the name). Same
+  // tanks, calibration and settings.
+  const mei26 = readFixture('Meitaki-2026-10-15.zcf')
+  assert.deepStrictEqual([mei.layout, mei26.layout, mei26.count], ['long', 'short', 6])
+  const summary = r => r.monitors.map(m => [m.name, m.module, m.input, m.calibration.map(p => [p.senderValue, p.levelRaw]), m.configuration.capacityLitres, m.configuration.low.on.raw, m.configuration.high.on.raw])
+  assert.deepStrictEqual(summary(mei26), summary(mei))
+  assert.deepStrictEqual(mei26.monitors.map(m => m.configurationLength), [54, 54, 54, 54, 54, 54])
+  assert.strictEqual(zcf.parse(fs.readFileSync(fixture('Meitaki-2026-10-15.zcf'))).tankMonitors.count, 6)
 }
 
 {

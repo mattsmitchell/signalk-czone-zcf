@@ -42,4 +42,20 @@ assert.strictEqual(status.recordCount,1)
 const byName=buildStatusMap(status)
 assert.deepStrictEqual([byName.get('Test Circuit').statusModule,byName.get('Test Circuit').statusBit], [0x14,13])
 assert.strictEqual(buildStatusOutputMap(status).get('20:13').name,'Test Circuit')
+
+// The same records with the 18-byte header a newer Configuration Tool
+// writes (one more byte before the name length): Meitaki's April 2025 and
+// October 2026 files.
+{
+  const fs = require('fs')
+  const path = require('path')
+  const read = name => fs.readFileSync(path.join(__dirname, 'fixtures', name))
+  const pick = buf => {
+    const st = parseStatusTable(buf, parseCircuitTable(buf))
+    const alarm = buildStatusMap(st)
+    return [st.records.length, st.records[0].rawHeaderHex.length / 2, st.records.find(r => r.name === 'Audible Alarm').statusModule, st.records.find(r => r.name === 'Audible Alarm').statusBit, alarm.size > 0]
+  }
+  assert.deepStrictEqual(pick(read('Meitaki-07.04.25.zcf')), [139, 17, 0x12, 4, true])
+  assert.deepStrictEqual(pick(read('Meitaki-2026-10-15.zcf')), [144, 18, 0x12, 4, true])
+}
 console.log('CZone status-table parser tests passed')
