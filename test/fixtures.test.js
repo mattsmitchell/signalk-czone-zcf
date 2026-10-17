@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const { parse, parseCircuitTable, buildCircuitModel } = require('../')
 
-const expected = ['Compass-Rose-28.06.26.zcf', 'Meitaki-07.04.25.zcf', 'Persevere-14.07.25.zcf', 'Sel-Citron-02.04.25.zcf', 'SugarShack-20260927-01.zcf', 'TestBench.zcf']
+const expected = ['Compass-Rose-28.06.26.zcf', 'Meitaki-07.04.25.zcf', 'Meitaki-2026-10-15.zcf', 'Persevere-14.07.25.zcf', 'Sel-Citron-02.04.25.zcf', 'SugarShack-20260927-01.zcf', 'TestBench.zcf']
 const dir = path.join(__dirname, 'fixtures')
 
 assert.deepStrictEqual(fs.readdirSync(dir).filter(f => f.endsWith('.zcf')).sort(), expected)
