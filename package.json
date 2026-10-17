@@ -1,6 +1,6 @@
 {
   "name": "signalk-czone-zcf",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "description": "Canonical structural parser for Signal K CZone ZCF configuration and status tables",
   "author": "svSugarShack <matt@ick.com>",
   "license": "MIT",

@@ -11,7 +11,7 @@ This library is a beta and is installed automatically by `signalk-czone`. It is 
 For other Node.js consumers, after npm publication:
 
 ```bash
-npm install signalk-czone-zcf@0.1.0-beta.1
+npm install signalk-czone-zcf@0.1.0-beta.2
 ```
 
 ## Publishing (maintainers)
