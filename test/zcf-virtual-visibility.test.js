@@ -85,6 +85,18 @@ assert.deepStrictEqual(existingFiles, [
   'TestBench.zcf'
 ])
 
+// Expected counts from the main-branch visibility behavior, captured before
+// the virtual-switch exception. Lock these alongside the per-circuit check.
+const baselineCounts = {
+  'Compass-Rose-28.06.26.zcf': { visible: 22, hidden: 13 },
+  'Meitaki-07.04.25.zcf': { visible: 104, hidden: 3 },
+  'Meitaki-2026-10-15.zcf': { visible: 118, hidden: 5 },
+  'Persevere-14.07.25.zcf': { visible: 40, hidden: 18 },
+  'Sel-Citron-02.04.25.zcf': { visible: 88, hidden: 14 },
+  'SugarShack-20260927-01.zcf': { visible: 102, hidden: 8 },
+  'TestBench.zcf': { visible: 6, hidden: 0 }
+}
+
 for (const file of existingFiles) {
   const model = parse(fs.readFileSync(path.join(fixtures, file)))
   const baseline = model.circuits.map(c => !c.virtual.virtualOnly && c.display.onDisplay)
@@ -100,6 +112,10 @@ for (const file of existingFiles) {
   const afterHidden = actual.length - afterVisible
   assert.strictEqual(afterVisible, beforeVisible, file + ': visible count changed')
   assert.strictEqual(afterHidden, beforeHidden, file + ': hidden count changed')
+  assert.strictEqual(afterVisible, baselineCounts[file].visible,
+    file + ': main-branch visible count mismatch')
+  assert.strictEqual(afterHidden, baselineCounts[file].hidden,
+    file + ': main-branch hidden count mismatch')
   console.log(file + ': ' + afterVisible + ' visible, ' + afterHidden + ' hidden (unchanged)')
 }
 
@@ -138,6 +154,10 @@ const oldHiddenCount = november.circuits.length - oldVisible.length
 const newHiddenCount = november.circuits.length - newlyVisible.length
 assert.strictEqual(newlyVisible.length, oldVisible.length + 2,
   'November Sugar Shack: the only new visible circuits must be the two virtual switches')
+assert.strictEqual(oldVisible.length, 102, 'November Sugar Shack: expected baseline visible count')
+assert.strictEqual(oldHiddenCount, 10, 'November Sugar Shack: expected baseline hidden count')
+assert.strictEqual(newlyVisible.length, 104, 'November Sugar Shack: expected visible count')
+assert.strictEqual(newHiddenCount, 8, 'November Sugar Shack: expected hidden count')
 assert.strictEqual(newHiddenCount, oldHiddenCount - 2,
   'November Sugar Shack: the hidden count must decrease by exactly two')
 for (const circuit of november.circuits) {
