@@ -7,20 +7,9 @@ const { parse, parseCircuitTable, buildCircuitModel } = require('../')
 const expected = ['Compass-Rose-28.06.26.zcf', 'Meitaki-07.04.25.zcf', 'Meitaki-2026-10-15.zcf', 'Persevere-14.07.25.zcf', 'Sel-Citron-02.04.25.zcf', 'SugarShack-20260927-01.zcf', 'TestBench.zcf']
 const dir = path.join(__dirname, 'fixtures')
 
-// Visibility regression baselines: only display-controlled virtual-only circuits
-// should become visible. All other circuit visibility must remain unchanged.
-const newlyVisibleByFixture = {
-  'Compass-Rose-28.06.26.zcf': [
-    'Freezer -12⁰C', 'Freezer -18⁰C', 'Freezer 4⁰C',
-    'Fridge 4⁰C', 'Fridge 6⁰C', 'Fridge 8⁰C', 'Test VS'
-  ],
-  'Meitaki-07.04.25.zcf': [],
-  'Meitaki-2026-10-15.zcf': [],
-  'Persevere-14.07.25.zcf': [],
-  'Sel-Citron-02.04.25.zcf': [],
-  'SugarShack-20260927-01.zcf': [],
-  'TestBench.zcf': []
-}
+// The seven existing fixtures must not gain virtual-only circuits merely
+// because a thermostat or chartplotter has a display control.
+const expectedNewVirtualSwitches = Object.fromEntries(expected.map(file => [file, []]))
 
 assert.deepStrictEqual(fs.readdirSync(dir).filter(f => f.endsWith('.zcf')).sort(), expected)
 
@@ -40,31 +29,20 @@ for (const file of expected) {
 
   assert(Array.isArray(parsed.circuits), file)
   const newlyVisible = parsed.circuits.filter(c =>
-    c.virtual.virtualOnly && c.display.onDisplay
+    c.virtual.virtualOnly && c.showInCircuitList
   )
   assert.deepStrictEqual(
     newlyVisible.map(c => c.name).sort(),
-    newlyVisibleByFixture[file].slice().sort(),
-    file + ': unexpected display-controlled virtual circuits'
+    expectedNewVirtualSwitches[file],
+    file + ': unexpected visible virtual-only circuits'
   )
   for (const circuit of parsed.circuits) {
     const previousVisibility = !circuit.virtual.virtualOnly && circuit.display.onDisplay
-    const expectedVisibility = previousVisibility || newlyVisible.includes(circuit)
     assert.strictEqual(
-      circuit.showInCircuitList, expectedVisibility,
+      circuit.showInCircuitList, previousVisibility,
       file + ': visibility regression for circuit ' + circuit.name
     )
-    assert.strictEqual(
-      circuit.showInCircuitList, circuit.display.onDisplay,
-      file + ': display control must determine visibility for ' + circuit.name
-    )
   }
-  assert.strictEqual(
-    parsed.circuits.filter(c => c.showInCircuitList).length -
-      parsed.circuits.filter(c => !c.virtual.virtualOnly && c.display.onDisplay).length,
-    newlyVisibleByFixture[file].length,
-    file + ': unexpected visible-circuit count change'
-  )
   assert.strictEqual(parsed.circuits.length, parsed.circuitTable.records.filter(r => r.kind === 'circuit').length, file)
   assert(parsed.circuits.every(c =>
     (c.module === null && c.channel === null) ||
@@ -123,12 +101,16 @@ for (const name of sugarNoStatus) {
 }
 
 const compass = parse(fs.readFileSync(path.join(dir, 'Compass-Rose-28.06.26.zcf')))
-const compassVirtual = compass.circuits.filter(c =>
-  newlyVisibleByFixture['Compass-Rose-28.06.26.zcf'].includes(c.name)
-)
-assert.strictEqual(compassVirtual.length, 7)
-assert.strictEqual(new Set(compassVirtual.map(c => c.zcfCircuitId)).size, 7,
-  'Compass Rose: shared virtual outputs must retain distinct circuit IDs')
+for (const name of [
+  'Freezer -12⁰C', 'Freezer -18⁰C', 'Freezer 4⁰C',
+  'Fridge 4⁰C', 'Fridge 6⁰C', 'Fridge 8⁰C', 'Test VS'
+]) {
+  const circuit = compass.circuits.find(c => c.name === name)
+  assert(circuit, 'Compass Rose: expected ' + name)
+  assert.strictEqual(circuit.virtual.virtualOnly, true)
+  assert.strictEqual(circuit.showInCircuitList, false,
+    'Compass Rose: thermostat/test virtual circuit must remain hidden: ' + name)
+}
 
 const lights = compass.circuits.find(c => c.name === 'Lights')
 assert(lights, 'Compass Rose: expected Lights')

@@ -93,7 +93,24 @@ const displayControlledVirtualWithTypedModule = buildCircuitModel(
 )[0]
 
 assert.strictEqual(displayControlledVirtualWithTypedModule.virtual.virtualOnly, true)
-assert.strictEqual(displayControlledVirtualWithTypedModule.showInCircuitList, true)
+assert.strictEqual(displayControlledVirtualWithTypedModule.showInCircuitList, false)
+
+const refrigerationThermostat = buildCircuitModel(
+  [record({
+    name: 'Fridge 4⁰C',
+    flags: 0x80000000,
+    outputs: [{ module: 2, channel: 37 }],
+    controls: [{
+      index: 0, input: 0, module: 0, controlType: 4, setting: 0,
+      byte2: 0, byte5: 0, descriptionLength: 0, description: ''
+    }]
+  })],
+  new Map(), new Map(), null, null, []
+)[0]
+
+assert.strictEqual(refrigerationThermostat.virtual.virtualOnly, true)
+assert.strictEqual(refrigerationThermostat.display.onDisplay, true)
+assert.strictEqual(refrigerationThermostat.showInCircuitList, false)
 
 const nonDisplayControlledVirtual = buildCircuitModel(
   [record({
