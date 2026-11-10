@@ -120,7 +120,7 @@ assert.deepStrictEqual(
   'November Sugar Shack: virtual switch identity and channels'
 )
 for (const circuit of visibleVirtualCircuits) {
-  assert.strictEqual(c.virtual.outputCount, 1,
+  assert.strictEqual(circuit.virtual.outputCount, 1,
     'November Sugar Shack: visible virtual switch must have one virtual output')
   assert.strictEqual(c.display.onDisplay, true,
     'November Sugar Shack: visible virtual switch must have a display control')
