@@ -15,3 +15,16 @@ Current corpus:
 - `SugarShack-20260927-01.zcf`
 
 Controlled variants may be added only with a note documenting the exact byte-level change and its purpose.
+
+## Virtual-switch visibility fixture
+
+- `virtual/Sugar Shack-20261103-04.zcf`: unmodified 15,491-byte ZCF supplied
+  for visibility regression on November 10, 2026 (SHA-256:
+  `b6e7255c71bf5a928651ad011bd01d1512a0cab2febb7da38b590bca9bfed29c`).
+  This configuration contains two virtual-only, single-output circuits with
+  explicit All Display Interfaces controls (IDs 120 and 121, module 28 channels
+  33 and 32). The proposed visibility rule should expose exactly these two,
+  while preserving all other circuit visibility. The nested fixture keeps the
+  original seven-file root corpus unchanged, including the exact-file-list
+  assertion in `test/fixtures.test.js`. No vessel or circuit name is used
+  in the parser's visibility decision.
