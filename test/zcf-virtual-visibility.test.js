@@ -122,9 +122,9 @@ assert.deepStrictEqual(
 for (const circuit of visibleVirtualCircuits) {
   assert.strictEqual(circuit.virtual.outputCount, 1,
     'November Sugar Shack: visible virtual switch must have one virtual output')
-  assert.strictEqual(c.display.onDisplay, true,
+  assert.strictEqual(circuit.display.onDisplay, true,
     'November Sugar Shack: visible virtual switch must have a display control')
-  assert(c.display.controls.some(control => control.module === 0),
+  assert(circuit.display.controls.some(control => control.module === 0),
     'November Sugar Shack: expected All Display Interfaces control')
 }
 
