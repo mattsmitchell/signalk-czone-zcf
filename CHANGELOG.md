@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-beta.3
+
+- Show virtual-only circuits in the app-facing circuit list when they have exactly one virtual output and an explicit All Display Interfaces control; preserve physical-circuit visibility.
+- Add an unmodified November Sugar Shack ZCF fixture and regression tests confirming both new virtual switches are visible and all seven existing fixture corpora retain identical visible/hidden counts and per-circuit visibility.
+
+
 ## 0.1.0-beta.2
 
 - Reads files saved by a newer CZone Configuration Tool (Meitaki, October 2026): status-table records with an 18-byte header, and signal-input records 6 bytes shorter (no `00 00 00 00 ff ff` before the name). Previously such a file gave no status table and no tank monitors.
